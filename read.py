@@ -4,6 +4,7 @@ import json
 from environment.environment import SRBEnvironment
 from agent.agent import *
 from runner.runner import Runner
+from collections import Counter
 
 data = pd.read_csv("youths.csv")
 player_results = {}
@@ -57,16 +58,8 @@ param_agent_ucb_srb = {
 param_env = {'horizon': horizon}
 env = SRBEnvironment(horizon=horizon, actions=arms, names=players, noise=1)
 
-# agent = [Uniform(**param_agent_unif),
-#           UniformSmooth(**param_agent_unif_smooth),
-#           UcbE(**param_agent_ucb),
-#           UcbSRB(**param_agent_ucb_srb),
-#           Sr(**param_agent_sr),
-#           Prob1(**param_agent_prob),
-#           Etc(**param_agent_etc),
-#           RestSure(**param_agent_rest_sure)]
+
 agent = SRSrb(**param_agent_sr_srb)
-# agent = UcbSRB(**param_agent_ucb_srb)
 
 
 runner = Runner(
@@ -91,15 +84,12 @@ estimators_all_trials = np.array(runner.results[agent.name]["estimators"])
 print(f"Players: {players}")
 # print("Recommendation Raw List: " + str(recommendations)) # Optional: raw list
 
-# --- NEW EVALUATION (Example) ---
-from collections import Counter
-import numpy as np
+
 
 recommendation_counts = Counter(recommendations)
 print("\nRecommendation Counts (Player Index):")
 # Sort by frequency for clarity
 for idx, count in recommendation_counts.most_common():
-    # Ensure index is within bounds before accessing players list
     player_name = players[int(idx)] if 0 <= int(idx) < len(players) else f"Unknown Index {int(idx)}"
     print(f"  Player Index {int(idx)} ({player_name}): {count} / {runner.n_trials} trials")
 
@@ -127,16 +117,5 @@ if recommendation_counts: # Check if there are any recommendations
 else:
     print("\nNo recommendations were made (or recorded properly).")
 
-# --- DELETE THIS BLOCK ---
-# if horizon >= 2000:
-#     count = recommendations.count(2)
-# else:
-#     count = recommendations.count(5)
-# print("Recommendation: " + str(runner.results[agent.name]["recommendations"])) # Already printed better above
-# print("Empirical Error " + str(agent.name) + ": " + str((runner.n_trials - count) / runner.n_trials)) # This is meaningless here
-# --- END DELETE BLOCK ---
 
-# save the output
-# name = str(horizon)
-# runner.save_output(name) # If you want to save detailed results
 print("##############################################################")
