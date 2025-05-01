@@ -117,5 +117,5 @@ if recommendation_counts: # Check if there are any recommendations
 else:
     print("\nNo recommendations were made (or recorded properly).")
 
-
+runner.save_output(str(horizon))
 print("##############################################################")
